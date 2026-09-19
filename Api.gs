@@ -13,11 +13,18 @@ function doPost(e) {
     var action = request.action;
     var args = request.args || [];
 
-    if (typeof this[action] !== 'function') {
+    var fn = null;
+    if (typeof globalThis !== 'undefined' && typeof globalThis[action] === 'function') {
+      fn = globalThis[action];
+    } else if (typeof this !== 'undefined' && typeof this[action] === 'function') {
+      fn = this[action];
+    }
+
+    if (!fn) {
       throw new Error("រកមិនឃើញអនុគមន៍ '" + action + "' នៅលើ Server ឡើយ។");
     }
 
-    var result = this[action].apply(this, args);
+    var result = fn.apply(null, args);
     output = ContentService.createTextOutput(JSON.stringify(result === undefined ? null : result));
 
   } catch (error) {

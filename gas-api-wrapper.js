@@ -54,15 +54,20 @@
               throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
             }
             const text = await response.text();
+            let data;
             try {
-              return JSON.parse(text);
+              data = JSON.parse(text);
             } catch (e) {
-              return text;
+              if (text.includes('<html') || text.includes('<!DOCTYPE') || text.includes('Google Apps Script') || text.includes('doPost')) {
+                throw new Error("Google Apps Script មិនទាន់បាន Deploy 'New Version' ដែលមាន doPost(e) នៅឡើយទេ។ សូមចូលទៅ script.google.com រួចចុច Deploy > Manage deployments > Edit > ជ្រើសរើស Version 'New version' > Deploy។");
+              }
+              throw new Error("ការឆ្លើយតបពី Server មិនមែនជាទម្រង់ JSON ត្រឹមត្រូវឡើយ៖ " + text.substring(0, 120));
             }
+            return data;
           })
           .then((res) => {
             if (res && res.__isGasError) {
-              const err = new Error(res.message);
+              const err = new Error(res.message || "កំហុសបច្ចេកទេសនៅលើ Apps Script Server");
               if (typeof failureHandler === 'function') {
                 failureHandler(err, userObj);
               } else {

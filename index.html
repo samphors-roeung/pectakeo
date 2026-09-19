@@ -1730,7 +1730,18 @@ return {
           <label>ស្រុក/ក្រុង ដែលអ្នកទទួលបន្ទុក</label>
           <div class="input-icon">
             <span class="ic">🏙️</span>
-            <select id="suDistrict" class="form-control" onchange="populateSuCommuneOptions_()" onkeydown="handleAuthFieldNavKey_(event, SIGNUP_FIELD_ORDER_, doSignup);"></select>
+            <select id="suDistrict" class="form-control" onchange="populateSuCommuneOptions_()" onkeydown="handleAuthFieldNavKey_(event, SIGNUP_FIELD_ORDER_, doSignup);">
+              <option value="អង្គរបូរី">អង្គរបូរី</option>
+              <option value="បាទី">បាទី</option>
+              <option value="បូរីជលសារ">បូរីជលសារ</option>
+              <option value="គិរីវង់">គិរីវង់</option>
+              <option value="កោះអណ្តែត">កោះអណ្តែត</option>
+              <option value="ព្រៃកប្បាស">ព្រៃកប្បាស</option>
+              <option value="សំរោង">សំរោង</option>
+              <option value="ដូនកែវ">ដូនកែវ</option>
+              <option value="ត្រាំកក់">ត្រាំកក់</option>
+              <option value="ទ្រាំង">ទ្រាំង</option>
+            </select>
           </div>
         </div>
         <div class="form-group" id="suCommuneGroup" style="display:none;">
@@ -3268,12 +3279,73 @@ return {
     // ជាមួយទំព័រខាងក្រៅ (window.top) — JavaScript ខាងក្នុង iframe មិនអាចអាន window.top.location.href
     // បានទេ (Cross-Origin Security) ដូច្នេះត្រូវឲ្យ Server (Apps Script) ផ្តល់ URL នេះមកជាមុន ====
     var GAS_EXEC_URL_ = '<?!= ScriptApp.getService().getUrl() ?>';
+    if (!GAS_EXEC_URL_ || GAS_EXEC_URL_.indexOf('<?') === 0) {
+      GAS_EXEC_URL_ = 'https://script.google.com/macros/s/AKfycbxNBwlpLENSGCA-zyCyY_WHvYLDhVtku-9Hd46PTzLwCEsTqB_gXOXlYawlI7egoU-J/exec';
+    }
     // ==== FIX (សំណើថ្មី "គណនីឃុំសង្កាត់")៖ ទាញយកតម្លៃ ROLE_COMMUNE ពិតប្រាកដពី Server (Utils.gs) ដោយផ្ទាល់ តាមរយៈ
     // Scriptlet — ជៀសវាងហានិភ័យសរសេរខុសគ្នារវាង Client/Server ប្រសិនបើសរសេរអក្សរដោយដៃដាច់ដោយឡែក ====
     var ROLE_COMMUNE_STR_ = '<?!= ROLE_COMMUNE ?>';
-    // ==== FIX (គណនីឃុំសង្កាត់)៖ បញ្ជីឃុំសង្កាត់តាមស្រុក ({district: [{code,name}, ...]}) — ផ្ទុកមុន Login ពី
-    // getAuthPageInfo() សម្រាប់ Dropdown Cascading នៅ Panel ស្នើសុំគណនីថ្មី ====
-    var AUTH_COMMUNE_ORDER_ = {};
+    if (!ROLE_COMMUNE_STR_ || ROLE_COMMUNE_STR_.indexOf('<?') === 0) {
+      ROLE_COMMUNE_STR_ = 'អ្នកបញ្ចូលទិន្នន័យឃុំសង្កាត់';
+    }
+    // ==== FIX (Fallback ឃុំសង្កាត់)៖ បញ្ជីឃុំសង្កាត់តាមស្រុកជាលំនាំដើម (១០ស្រុក ខេត្តតាកែវ) ដើម្បីកុំឲ្យ Dropdown ទទេ ====
+    var AUTH_COMMUNE_ORDER_ = {
+      "អង្គរបូរី": [
+        { code: "21-001", name: "អង្គរបូរី" }, { code: "21-002", name: "បាស្រែ" }, { code: "21-003", name: "គោកធ្លក" },
+        { code: "21-004", name: "ពន្លៃ" }, { code: "21-005", name: "ព្រែកផ្ទោល" }, { code: "21-006", name: "ព្រៃផ្គាំ" }
+      ],
+      "បាទី": [
+        { code: "21-007", name: "ចំបក់" }, { code: "21-008", name: "ចំប៉ី" }, { code: "21-009", name: "ដូង" },
+        { code: "21-010", name: "កណ្តឹង" }, { code: "21-011", name: "កុមាររាជា" }, { code: "21-012", name: "ក្រាំងលាវ" },
+        { code: "21-013", name: "ក្រាំងធ្នង់" }, { code: "21-014", name: "លំពង់" }, { code: "21-015", name: "ពារាម" },
+        { code: "21-016", name: "ពត់សរ" }, { code: "21-017", name: "សូរភី" }, { code: "21-018", name: "តាំងដូង" },
+        { code: "21-019", name: "ត្នោត" }, { code: "21-020", name: "ត្រពាំងក្រសាំង" }, { code: "21-021", name: "ត្រពាំងសាប" }
+      ],
+      "បូរីជលសារ": [
+        { code: "21-022", name: "បូរីជលសារ" }, { code: "21-023", name: "ជ័យជោគ" }, { code: "21-024", name: "ដួងខ្ពស់" },
+        { code: "21-025", name: "កំពង់ក្រសាំង" }, { code: "21-026", name: "គោកពោធិ៍" }
+      ],
+      "គិរីវង់": [
+        { code: "21-027", name: "អង្គប្រាសាទ" }, { code: "21-028", name: "ព្រះបាទជាន់ជុំ" }, { code: "21-029", name: "កំណប់" },
+        { code: "21-030", name: "កំពែង" }, { code: "21-031", name: "គីរីចុងកោះ" }, { code: "21-032", name: "គោកព្រេច" },
+        { code: "21-033", name: "ភ្នំដិន" }, { code: "21-034", name: "ព្រៃអំពក" }, { code: "21-035", name: "ព្រៃរំដេង" },
+        { code: "21-036", name: "រាមអណ្តើក" }, { code: "21-037", name: "សោម" }, { code: "21-038", name: "តាអូរ" }
+      ],
+      "កោះអណ្តែត": [
+        { code: "21-039", name: "ក្រពុំឈូក" }, { code: "21-040", name: "ពេជសារ" }, { code: "21-041", name: "ព្រៃខ្លា" },
+        { code: "21-042", name: "ព្រៃយុថ្កា" }, { code: "21-043", name: "រមេញ" }, { code: "21-044", name: "ធ្លាប្រជុំ" }
+      ],
+      "ព្រៃកប្បាស": [
+        { code: "21-045", name: "អង្កាញ់" }, { code: "21-046", name: "បានកាម" }, { code: "21-047", name: "ចំប៉ា" },
+        { code: "21-048", name: "ចារ" }, { code: "21-049", name: "កំពែង" }, { code: "21-050", name: "កំពង់រាប" },
+        { code: "21-051", name: "ក្តាញ់" }, { code: "21-052", name: "ពោធិ៍រំចាក" }, { code: "21-053", name: "ព្រៃកប្បាស" },
+        { code: "21-054", name: "ព្រៃល្វា" }, { code: "21-055", name: "ព្រៃផ្តៅ" }, { code: "21-056", name: "ស្នោ" },
+        { code: "21-057", name: "តាំងយ៉ាប" }
+      ],
+      "សំរោង": [
+        { code: "21-058", name: "បឹងត្រាញ់ខាងជើង" }, { code: "21-059", name: "បឹងត្រាញ់ខាងត្បូង" }, { code: "21-060", name: "ជើងគួន" },
+        { code: "21-061", name: "ជំរះពេន" }, { code: "21-062", name: "ខ្វាវ" }, { code: "21-063", name: "លំចង់" },
+        { code: "21-064", name: "រវៀង" }, { code: "21-065", name: "សំរោង" }, { code: "21-066", name: "សឹង្ហ" },
+        { code: "21-067", name: "ស្លា" }, { code: "21-068", name: "ទ្រា" }
+      ],
+      "ដូនកែវ": [
+        { code: "21-069", name: "បារាយណ៍" }, { code: "21-070", name: "រកាក្នុង" }, { code: "21-071", name: "រកាក្រៅ" }
+      ],
+      "ត្រាំកក់": [
+        { code: "21-072", name: "អង្គតាសោម" }, { code: "21-073", name: "ជាងទង" }, { code: "21-074", name: "គុស" },
+        { code: "21-075", name: "លាយបូរ" }, { code: "21-076", name: "ញ៉ែងញ៉ង" }, { code: "21-077", name: "អូរសារាយ" },
+        { code: "21-078", name: "ឧត្តមសុរិយា" }, { code: "21-079", name: "ពពេល" }, { code: "21-080", name: "សំរោង" },
+        { code: "21-081", name: "ស្រែរនោង" }, { code: "21-082", name: "តាភេម" }, { code: "21-083", name: "ត្រាំកក់" },
+        { code: "21-084", name: "ត្រពាំងធំខាងជើង" }, { code: "21-085", name: "ត្រពាំងធំខាងត្បូង" }, { code: "21-099", name: "ត្រពាំងក្រញូង" }
+      ],
+      "ទ្រាំង": [
+        { code: "21-086", name: "អង្កាញ់" }, { code: "21-087", name: "អង្គខ្នុរ" }, { code: "21-088", name: "ជីខ្មា" },
+        { code: "21-089", name: "ខ្វាវ" }, { code: "21-090", name: "ប្រាំបីមុំ" }, { code: "21-091", name: "ព្រៃស្លឹក" },
+        { code: "21-092", name: "រនាម" }, { code: "21-093", name: "សំបួរ" }, { code: "21-094", name: "សន្លុង" },
+        { code: "21-095", name: "ស្មោង" }, { code: "21-096", name: "ស្រង៉ែ" }, { code: "21-097", name: "ធ្លក" },
+        { code: "21-098", name: "ត្រឡាច" }, { code: "21-100", name: "អង្គកែវ" }
+      ]
+    };
     // ==== FIX (Fix127, "ជម្រើសបើក/បិទប្រើប្រាស់គណនីឃុំសង្កាត់")៖ ថតទុកតម្លៃចុងក្រោយពី Server (getAuthPageInfo)
     // ដើម្បីលាក់/បង្ហាញជម្រើស "អ្នកបញ្ចូលទិន្នន័យឃុំសង្កាត់" ចេញពី Dropdown "ប្រភេទគណនី" នៅ Panel ស្នើសុំគណនីថ្មី —
     // លំនាំដើម true (អនុញ្ញាត) ដូចគ្នានឹងលំនាំដើម Server ចាំបាច់ ដើម្បីកុំឲ្យលាក់ខុសឆ្គងមុន Server ឆ្លើយតបមកវិញ ====
@@ -3478,13 +3550,23 @@ return {
                 document.getElementById('statMembers').textContent = res.memberCount;
                 document.getElementById('statVisits').textContent = res.visitCount;
             }
-            var sel = document.getElementById('suDistrict');
-            sel.innerHTML = '';
-            (res.districts || []).forEach(function(d) {
-                var opt = document.createElement('option'); opt.value = d; opt.textContent = d; sel.appendChild(opt);
-            });
+            if (res.districts && res.districts.length > 0) {
+                var sel = document.getElementById('suDistrict');
+                if (sel) {
+                    var prevVal = sel.value;
+                    sel.innerHTML = '';
+                    res.districts.forEach(function(d) {
+                        var opt = document.createElement('option'); opt.value = d; opt.textContent = d; sel.appendChild(opt);
+                    });
+                    if (prevVal && res.districts.indexOf(prevVal) > -1) {
+                        sel.value = prevVal;
+                    }
+                }
+            }
             // ==== FIX (គណនីឃុំសង្កាត់)៖ រក្សាទុកបញ្ជីឃុំសង្កាត់តាមស្រុក (សម្រាប់ Dropdown ស្នើសុំគណនីឃុំសង្កាត់ Cascading) ====
-            AUTH_COMMUNE_ORDER_ = res.communeOrder || {};
+            if (res.communeOrder && Object.keys(res.communeOrder).length > 0) {
+                AUTH_COMMUNE_ORDER_ = res.communeOrder;
+            }
             // ==== FIX (Fix127, "ជម្រើសបើក/បិទប្រើប្រាស់គណនីឃុំសង្កាត់")៖ លាក់ជម្រើស "អ្នកបញ្ចូលទិន្នន័យឃុំសង្កាត់"
             // ចេញពី Dropdown "ប្រភេទគណនី" បើ SuperAdmin/Admin បិទមុខងារនេះ — បើអ្នកប្រើកំពុងជ្រើសរើសជម្រើសនេះនៅ
             // ខណៈកំពុងបិទ (ឧ. Admin ទើបតែបិទ ខណៈអ្នកប្រើកំពុងបើកទំព័រ Signup ស្រាប់) ត្រូវប្តូរត្រឡប់ទៅ "គ្រូប្រចាំស្រុក"
@@ -4268,6 +4350,7 @@ return {
             var opt = document.createElement('option'); opt.value = c.name; opt.textContent = c.name; communeSel.appendChild(opt);
         });
     }
+    try { populateSuCommuneOptions_(); } catch (eInitCommune) {}
 
     function doSignup() {
         var errEl = document.getElementById('signupError');
