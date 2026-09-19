@@ -1,0 +1,63 @@
+name: Automated Daily Data Backup
+
+on:
+  schedule:
+    # Runs everyday at 17:00 UTC (00:00 / midnight Cambodia Time UTC+7)
+    - cron: '0 17 * * *'
+  workflow_dispatch: # Allows manual one-click backup from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create backup directories
+        run: |
+          mkdir -p backups/daily
+
+      - name: Download Master Google Sheet as Excel (.xlsx)
+        run: |
+          SHEET_URL="https://docs.google.com/spreadsheets/d/1M3H0vSTl9w9yfUZCR9ElXqXU4MXOKlcR-tpGERyCsdU/export?format=xlsx"
+          curl -s -L "$SHEET_URL" -o backups/pectakeo_master_latest.xlsx
+          
+          # Verify file was downloaded and is not empty
+          if [ -s backups/pectakeo_master_latest.xlsx ]; then
+            echo "Master Excel file downloaded successfully. Size: $(du -h backups/pectakeo_master_latest.xlsx | cut -f1)"
+            TODAY=$(date +'%Y-%m-%d')
+            cp backups/pectakeo_master_latest.xlsx "backups/daily/pectakeo_${TODAY}.xlsx"
+          else
+            echo "Warning: Master Excel file download was empty or failed"
+          fi
+
+      - name: Download API Metadata Snapshot (.json)
+        run: |
+          GAS_URL="https://script.google.com/macros/s/AKfycbz6tkV50ynsjBavfLrDBq34mBforpqM3bdB2FjxFuFqye31xyz_x1aGfwJYSgTaHlsk/exec"
+          curl -s -L -X POST \
+            -H "Content-Type: text/plain;charset=utf-8" \
+            -d '{"action":"getAuthPageInfo","args":[false]}' \
+            "$GAS_URL" -o backups/metadata_latest.json
+          
+          if [ -s backups/metadata_latest.json ]; then
+            echo "Metadata snapshot saved successfully."
+          fi
+
+      - name: Commit and Push Backup Archive
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add backups/
+          
+          if git diff --staged --quiet; then
+            echo "No data changes detected. Everything is up-to-date."
+          else
+            TODAY=$(date +'%Y-%m-%d')
+            git commit -m "chore(backup): automated daily data backup ${TODAY} [skip ci]"
+            git push
+            echo "Backup successfully committed and pushed to repository."
+          fi
