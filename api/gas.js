@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const GAS_URL = process.env.GAS_EXEC_URL || "https://script.google.com/macros/s/AKfycbxNBwlpLENSGCA-zyCyY_WHvYLDhVtku-9Hd46PTzLwCEsTqB_gXOXlYawlI7egoU-J/exec";
+  const GAS_URL = process.env.GAS_EXEC_URL || "https://script.google.com/macros/s/AKfycbz6tkV50ynsjBavfLrDBq34mBforpqM3bdB2FjxFuFqye31xyz_x1aGfwJYSgTaHlsk/exec";
 
   try {
     let body = req.body;

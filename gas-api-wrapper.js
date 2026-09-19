@@ -3,7 +3,7 @@
  * Allows google.script.run to work seamlessly on Vercel, Localhost, etc. via fetch()
  */
 (function(window) {
-  const GAS_EXEC_URL = "https://script.google.com/macros/s/AKfycbxNBwlpLENSGCA-zyCyY_WHvYLDhVtku-9Hd46PTzLwCEsTqB_gXOXlYawlI7egoU-J/exec";
+  const GAS_EXEC_URL = "https://script.google.com/macros/s/AKfycbz6tkV50ynsjBavfLrDBq34mBforpqM3bdB2FjxFuFqye31xyz_x1aGfwJYSgTaHlsk/exec";
   // Route through Vercel Serverless Proxy (/api/gas) to prevent browser CORS / Failed to fetch blocks
   const API_ENDPOINT = (window.location && window.location.origin && window.location.origin.startsWith('http'))
     ? '/api/gas'
