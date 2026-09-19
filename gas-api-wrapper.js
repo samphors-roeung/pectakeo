@@ -4,6 +4,10 @@
  */
 (function(window) {
   const GAS_EXEC_URL = "https://script.google.com/macros/s/AKfycbxNBwlpLENSGCA-zyCyY_WHvYLDhVtku-9Hd46PTzLwCEsTqB_gXOXlYawlI7egoU-J/exec";
+  // Route through Vercel Serverless Proxy (/api/gas) to prevent browser CORS / Failed to fetch blocks
+  const API_ENDPOINT = (window.location && window.location.origin && window.location.origin.startsWith('http'))
+    ? '/api/gas'
+    : GAS_EXEC_URL;
 
   // If running natively inside Google Apps Script iframe, use native runner
   if (window.google && window.google.script && window.google.script.run) {
@@ -37,7 +41,7 @@
           const actionName = prop;
 
           // text/plain avoids CORS preflight OPTIONS request
-          fetch(GAS_EXEC_URL, {
+          fetch(API_ENDPOINT, {
             method: 'POST',
             headers: {
               'Content-Type': 'text/plain;charset=utf-8'
@@ -46,7 +50,6 @@
               action: actionName,
               args: args
             }),
-            mode: 'cors',
             redirect: 'follow'
           })
           .then(async (response) => {
