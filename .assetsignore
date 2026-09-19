@@ -1,0 +1,14 @@
+node_modules
+.git
+.github
+*.gs
+functions
+worker.js
+wrangler.toml
+wrangler.json
+package.json
+package-lock.json
+bun.lockb
+bun.lock
+*.log
+.DS_Store
